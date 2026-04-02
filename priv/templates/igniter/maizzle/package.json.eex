@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "node ./utils/write-theme.js && maizzle serve --port 3000",
+    "build:dev": "node ./utils/write-theme.js && maizzle build development",
+    "build": "node ./utils/write-theme.js && maizzle build production"
+  },
+  "dependencies": {
+    "@maizzle/framework": "^5.2.0",
+    "@maizzle/tailwindcss": "^1.0.2"
+  }
+}

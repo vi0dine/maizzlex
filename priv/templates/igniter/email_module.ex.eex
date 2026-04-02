@@ -1,0 +1,22 @@
+defmodule <%= app_module %>.Emails.<%= module_base %> do
+  @moduledoc """
+  Email module for <%= module_base %>.
+  """
+
+  import <%= gettext_module %>
+  import Swoosh.Email
+
+  alias <%= app_module %>.Mailer
+
+  @template "<%= snake_name %>.html"
+
+  def call(receiver, assigns, attachments \\ []) do
+    html_body = Mailer.render_template(@template, assigns)
+
+    Mailer.transactional_email()
+    |> to(receiver)
+    |> subject(gettext("Emails.<%= module_base %>.Subject"))
+    |> html_body(html_body)
+    |> Mailer.send_email(attachments)
+  end
+end

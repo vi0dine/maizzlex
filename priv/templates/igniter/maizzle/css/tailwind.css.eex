@@ -1,0 +1,18 @@
+@import "@maizzle/tailwindcss";
+@import "./generated-theme.css";
+
+@source "../emails";
+@source "../layouts";
+@source "../components";
+
+@theme {
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.no-underline {
+  text-decoration: none !important;
+}
+
+.gmail-preserve-font * {
+  font-size: inherit !important;
+}

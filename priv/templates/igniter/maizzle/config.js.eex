@@ -1,0 +1,54 @@
+/** @type {import('@maizzle/framework').Config} */
+module.exports = {
+  build: {
+    content: ["emails/**/*.html", "layouts/**/*.html", "components/**/*.html"],
+    static: {
+      source: ["images/**/*.*"],
+      destination: "images",
+    },
+    tailwind: {
+      css: "css/tailwind.css",
+    },
+  },
+  css: {
+    purge: {
+      safelist: [
+        "*primary-*",
+        "*secondary-*",
+        "*accent-*",
+        "*info-*",
+        "*success-*",
+        "*warning-*",
+        "*error-*",
+        "*content-*",
+        "*hover*",
+        "*focus*",
+        "*active*",
+        "*screen*",
+      ],
+    },
+    shorthand: false,
+    minify: false,
+    prettify: false,
+    inline: false,
+  },
+  components: {
+    folders: ["layouts/"],
+  },
+  server: {
+    port: 3000,
+  },
+  maizzlex: {
+    gettextModule: "<%= gettext_module %>",
+    baseColors: {
+      primary: "#A75035",
+      secondary: "#B47614",
+      accent: "#823558",
+      info: "#2196F3",
+      success: "#4CAF50",
+      warning: "#ED6C02",
+      error: "#D32F2F",
+      content: "#4A443C",
+    },
+  },
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE {{{ page.doctype || "html" }}}>
+<html
+  lang="{{ page.language || 'en' }}"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+>
+  <head>
+    <meta charset="{{ page.charset || 'utf-8' }}" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="format-detection"
+      content="telephone=no, date=no, address=no, email=no, url=no"
+    />
+  </head>
+
+  <body class="m-0 p-0 w-full bg-primary-50" style="margin: 0; padding: 0; width: 100%;">
+    <%% import <%= gettext_module %> %>
+
+    <div class="mx-auto max-w-3xl px-6 py-10">
+      <div class="rounded-2xl bg-white px-8 py-8 shadow-sm">
+        <div
+          role="article"
+          aria-roledescription="email"
+          aria-label="{{{ page.title || '' }}}"
+          lang="{{ page.language || 'en' }}"
+          class="gmail-preserve-font text-base leading-7 text-content-700"
+          style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;"
+        >
+          <yield />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,108 @@
+const DEFAULT_BASE_COLORS = {
+  primary: "#A75035",
+  secondary: "#B47614",
+  accent: "#823558",
+  info: "#2196F3",
+  success: "#4CAF50",
+  warning: "#ED6C02",
+  error: "#D32F2F",
+  content: "#4A443C",
+}
+
+const SHADES = {
+  50: { mode: "light", amount: 0.95 },
+  100: { mode: "light", amount: 0.82 },
+  200: { mode: "light", amount: 0.58 },
+  300: { mode: "light", amount: 0.35 },
+  400: { mode: "light", amount: 0.16 },
+  500: { mode: "base", amount: 0.0 },
+  600: { mode: "dark", amount: 0.09 },
+  700: { mode: "dark", amount: 0.24 },
+  800: { mode: "dark", amount: 0.4 },
+  900: { mode: "dark", amount: 0.56 },
+  950: { mode: "dark", amount: 0.72 },
+}
+
+function clamp(value) {
+  return Math.max(0, Math.min(255, Math.round(value)))
+}
+
+function normalizeHex(value) {
+  const hex = value.replace("#", "").trim()
+
+  if (hex.length === 3) {
+    return `#${hex.split("").map((part) => `${part}${part}`).join("")}`.toUpperCase()
+  }
+
+  return `#${hex}`.toUpperCase()
+}
+
+function hexToRgb(hex) {
+  const normalized = normalizeHex(hex).replace("#", "")
+
+  return {
+    r: parseInt(normalized.slice(0, 2), 16),
+    g: parseInt(normalized.slice(2, 4), 16),
+    b: parseInt(normalized.slice(4, 6), 16),
+  }
+}
+
+function rgbToHex({ r, g, b }) {
+  return `#${[r, g, b]
+    .map((value) => clamp(value).toString(16).padStart(2, "0"))
+    .join("")}`.toUpperCase()
+}
+
+function mix(color, other, ratio) {
+  const current = hexToRgb(color)
+  const target = hexToRgb(other)
+
+  return rgbToHex({
+    r: current.r + (target.r - current.r) * ratio,
+    g: current.g + (target.g - current.g) * ratio,
+    b: current.b + (target.b - current.b) * ratio,
+  })
+}
+
+function buildScale(baseColor) {
+  return Object.entries(SHADES).reduce((acc, [shade, config]) => {
+    if (config.mode === "base") {
+      acc[shade] = normalizeHex(baseColor)
+    } else if (config.mode === "light") {
+      acc[shade] = mix(baseColor, "#FFFFFF", config.amount)
+    } else {
+      acc[shade] = mix(baseColor, "#000000", config.amount)
+    }
+
+    return acc
+  }, {})
+}
+
+function buildPalette(baseColors = {}) {
+  return Object.entries({ ...DEFAULT_BASE_COLORS, ...baseColors }).reduce((acc, [name, color]) => {
+    acc[name] = buildScale(color)
+    return acc
+  }, {})
+}
+
+function paletteToThemeCss(baseColors = {}) {
+  const palette = buildPalette(baseColors)
+  const lines = ["@theme {"]
+
+  for (const [name, shades] of Object.entries(palette)) {
+    for (const [shade, value] of Object.entries(shades)) {
+      lines.push(`  --color-${name}-${shade}: ${value};`)
+    }
+  }
+
+  lines.push("}")
+
+  return `${lines.join("\n")}\n`
+}
+
+module.exports = {
+  DEFAULT_BASE_COLORS,
+  buildPalette,
+  buildScale,
+  paletteToThemeCss,
+}

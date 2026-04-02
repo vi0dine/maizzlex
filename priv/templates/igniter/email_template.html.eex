@@ -1,0 +1,11 @@
+<x-main>
+  <div class="space-y-6">
+    <h1 class="text-2xl font-bold text-content-900">
+      <%%= gettext("Emails.Templates.<%= gettext_scope %>.Header") %>
+    </h1>
+
+    <p class="text-content-700 leading-relaxed">
+      Replace this body with your email content.
+    </p>
+  </div>
+</x-main>

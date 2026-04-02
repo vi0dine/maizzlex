@@ -1,0 +1,48 @@
+/** @type {import('@maizzle/framework').Config} */
+module.exports = {
+  build: {
+    output: {
+      path: "../priv/emails",
+    },
+    content: ["emails/**/*.html", "layouts/**/*.html", "components/**/*.html"],
+    static: {
+      source: ["images/**/*.*"],
+      destination: "images",
+    },
+    tailwind: {
+      css: "css/tailwind.css",
+    },
+  },
+  css: {
+    inline: {
+      codeBlocks: {
+        EJS: { start: ["<", "%"].join(""), end: ["%", ">"].join("") },
+        HBS: { start: "{{", end: "}}" },
+        EEx: { start: ["<", "%="].join(""), end: ["%", ">"].join("") },
+      },
+    },
+    purge: {
+      safelist: [
+        "*primary-*",
+        "*secondary-*",
+        "*accent-*",
+        "*info-*",
+        "*success-*",
+        "*warning-*",
+        "*error-*",
+        "*content-*",
+        "*hover*",
+        "*focus*",
+        "*active*",
+        "*screen*",
+      ],
+    },
+    shorthand: true,
+    prettify: false,
+    minify: true,
+  },
+  purgeCSS: {
+    content: ["emails/**/*.*"],
+  },
+  prettify: false,
+}
