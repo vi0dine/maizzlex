@@ -31,7 +31,28 @@ config :my_app, MyApp.Mailer,
   email_store: {MyApp.Mailers.DatabaseEmailStore, repo: MyApp.Repo}
 ```
 
+`api_client` is configured separately through Swoosh:
+
+```elixir
+config :swoosh, :api_client, Swoosh.ApiClient.Req
+```
+
 ## Runtime keys
+
+### `adapter`
+
+Required. This is the Swoosh adapter used for delivery.
+
+Typical values:
+
+```elixir
+adapter: Swoosh.Adapters.Local
+adapter: Swoosh.Adapters.Test
+adapter: Swoosh.Adapters.Brevo
+```
+
+Any additional keys required by the selected adapter are passed through unchanged to Swoosh.
+Examples include `api_key`, `domain`, `relay`, `username`, `password`, `region`, and `base_url`.
 
 ### `from`
 
@@ -132,6 +153,23 @@ email_store: {MyApp.Mailers.EmailStore, repo: MyApp.Repo}
 
 The store runs only after successful delivery. Errors are logged and ignored.
 
+## Global Swoosh config
+
+### `api_client`
+
+Optional for `Local` and `Test`. Required for HTTP-based Swoosh adapters.
+
+Supported forms:
+
+```elixir
+config :swoosh, :api_client, false
+config :swoosh, :api_client, Swoosh.ApiClient.Req
+config :swoosh, :api_client, Swoosh.ApiClient.Hackney
+config :swoosh, :api_client, Swoosh.ApiClient.Finch
+```
+
+`api_client` is not part of `config :my_app, MyApp.Mailer`. It must be configured under `:swoosh`.
+
 ## Build config
 
 `mix maizzlex.emails.build` reads app-level settings from:
@@ -139,7 +177,9 @@ The store runs only after successful delivery. Errors are logged and ignored.
 ```elixir
 config :my_app, :maizzlex,
   maizzle_dir: "maizzle",
-  build_command: {"npm", ["run", "build"]}
+  output_dir: "priv/emails",
+  build_command: {"npm", ["run", "build"]},
+  dev_command: {"npm", ["run", "dev"]}
 ```
 
 ### `maizzle_dir`
@@ -167,19 +207,26 @@ The MFA will receive:
 [maizzle_dir, config | extra_args]
 ```
 
-## Dev preview config
+### `output_dir`
 
-`Maizzlex.DevServerPlug` reads library-level settings from:
+Defaults to `Path.expand("../priv/emails", maizzle_dir)`.
+
+Before each build, `Maizzlex.Builder` clears this directory so only freshly built email
+templates remain in the output.
+
+### `dev_command`
+
+Defaults to:
 
 ```elixir
-config :maizzlex,
-  dev_server_url: "http://127.0.0.1:3000"
+{"npm", ["run", "dev"]}
 ```
 
-### `dev_server_url`
+This command is used by `mix maizzlex.emails.dev`.
 
-Defaults to `"http://127.0.0.1:3000"`.
+For tests or custom integrations you can also pass an MFA tuple:
 
-The Igniter installer points the host app router at `/dev/maizzle`, and that route
-reverse proxies the configured Maizzle dev server so preview requests use the same
-host and port as the Phoenix app.
+```elixir
+config :my_app, :maizzlex,
+  dev_command: {:mfa, {MyApp.MaizzleDevServer, :run, []}}
+```

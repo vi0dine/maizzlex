@@ -3,20 +3,27 @@ defmodule <%= app_module %>.Emails.<%= module_base %> do
   Email module for <%= module_base %>.
   """
 
-  import <%= gettext_module %>
+  use Gettext, backend: <%= gettext_module %>
   import Swoosh.Email
 
   alias <%= app_module %>.Mailer
 
+  @gettext_backend <%= gettext_module %>
   @template "<%= snake_name %>.html"
 
   def call(receiver, assigns, attachments \\ []) do
-    html_body = Mailer.render_template(@template, assigns)
+    Maizzlex.Mailer.with_locale(assigns, @gettext_backend, fn localized_assigns ->
+      html_body =
+        Mailer.render_template(
+          @template,
+          Maizzlex.Mailer.put_gettext_helpers(localized_assigns, @gettext_backend)
+        )
 
-    Mailer.transactional_email()
-    |> to(receiver)
-    |> subject(gettext("Emails.<%= module_base %>.Subject"))
-    |> html_body(html_body)
-    |> Mailer.send_email(attachments)
+      Mailer.transactional_email()
+      |> to(receiver)
+      |> subject(gettext("Emails.<%= module_base %>.Subject"))
+      |> html_body(html_body)
+      |> Mailer.send_email(attachments)
+    end)
   end
 end

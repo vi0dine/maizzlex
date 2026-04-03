@@ -1,4 +1,4 @@
-const DEFAULT_BASE_COLORS = {
+export const DEFAULT_BASE_COLORS = {
   primary: "#A75035",
   secondary: "#B47614",
   accent: "#823558",
@@ -64,7 +64,7 @@ function mix(color, other, ratio) {
   })
 }
 
-function buildScale(baseColor) {
+export function buildScale(baseColor) {
   return Object.entries(SHADES).reduce((acc, [shade, config]) => {
     if (config.mode === "base") {
       acc[shade] = normalizeHex(baseColor)
@@ -78,14 +78,14 @@ function buildScale(baseColor) {
   }, {})
 }
 
-function buildPalette(baseColors = {}) {
+export function buildPalette(baseColors = {}) {
   return Object.entries({ ...DEFAULT_BASE_COLORS, ...baseColors }).reduce((acc, [name, color]) => {
     acc[name] = buildScale(color)
     return acc
   }, {})
 }
 
-function paletteToThemeCss(baseColors = {}) {
+export function paletteToThemeCss(baseColors = {}) {
   const palette = buildPalette(baseColors)
   const lines = ["@theme {"]
 
@@ -98,11 +98,4 @@ function paletteToThemeCss(baseColors = {}) {
   lines.push("}")
 
   return `${lines.join("\n")}\n`
-}
-
-module.exports = {
-  DEFAULT_BASE_COLORS,
-  buildPalette,
-  buildScale,
-  paletteToThemeCss,
 }

@@ -5,5 +5,6 @@ This directory is owned by the host application.
 Typical workflow:
 
 1. edit templates in `maizzle/emails/**/*.html`
-2. run `mix maizzlex.emails.build`
-3. extract/update translations with `mix gettext.extract --merge`
+2. run `mix maizzlex.emails.dev` while working on the templates
+3. run `mix maizzlex.emails.build`
+4. extract/update translations with `mix gettext.extract --merge`

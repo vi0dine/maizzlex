@@ -4,8 +4,8 @@
 
 1. scaffold host files with `mix igniter.install maizzlex`
 2. install JS dependencies in `maizzle/`
-3. run `cd maizzle && npm run dev`
-4. preview through the host app at `/dev/maizzle`
+3. run `mix maizzlex.emails.dev`
+4. preview directly through the Maizzle dev server at `http://127.0.0.1:3000`
 5. generate email templates/modules with `mix igniter maizzlex.gen.email ...`
 6. edit `maizzle/emails/*.html`
 7. run `mix maizzlex.emails.build`
@@ -33,6 +33,9 @@ The task expects the host build to write compiled templates into:
 ```text
 priv/emails
 ```
+
+That output directory should contain only built email templates.
+Source-only folders such as `layouts`, `components`, and `images` stay in `maizzle/`.
 
 ## Why compiled templates stay as EEx
 

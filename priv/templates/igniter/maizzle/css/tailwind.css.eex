@@ -1,13 +1,6 @@
-@import "@maizzle/tailwindcss";
-@import "./generated-theme.css";
-
-@source "../emails";
-@source "../layouts";
-@source "../components";
-
-@theme {
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
+@config "tailwind.config.js";
+@tailwind components;
+@tailwind utilities;
 
 .no-underline {
   text-decoration: none !important;

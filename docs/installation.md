@@ -30,14 +30,19 @@ end
 priv/emails
 ```
 
-## Minimal runtime config
+## Minimal host config
 
-At minimum, configure a Swoosh adapter and a sender:
+At minimum, configure a sender and the Maizzlex build settings:
 
 ```elixir
 config :my_app, MyApp.Mailer,
-  adapter: Swoosh.Adapters.Test,
   from: {"My App", "noreply@example.com"}
+
+config :my_app, :maizzlex,
+  maizzle_dir: "maizzle",
+  build_command: {"npm", ["run", "build"]}
+
+config :swoosh, :api_client, false
 ```
 
 `from` can be either:
@@ -64,24 +69,21 @@ This creates:
 
 - `maizzle/config.js`
 - `maizzle/config.production.js`
+- `maizzle/tailwind.config.js`
 - `maizzle/css/tailwind.css`
-- `maizzle/css/generated-theme.css`
+- `maizzle/images/.gitkeep`
 - `maizzle/layouts/main.html`
 - `maizzle/components/button.html`
 - `maizzle/utils/palette.js`
-- `maizzle/utils/write-theme.js`
 - `maizzle/package.json`
 
-When a Phoenix router is found, the installer also appends:
+It also seeds config entries in:
 
-```elixir
-scope "/dev" do
-  forward("/maizzle", Maizzlex.DevServerPlug)
-end
-```
-
-That gives the host app a stable preview entrypoint at `/dev/maizzle`.
-Requests stay on the host app origin and are proxied to the Maizzle dev server upstream.
+- `config/config.exs`
+- `config/dev.exs`
+- `config/test.exs`
+- `config/prod.exs`
+- `config/runtime.exs`
 
 If your app uses a different Gettext backend than `MyAppWeb.Gettext`, pass it explicitly:
 
@@ -97,21 +99,25 @@ The scaffolded `maizzle/package.json` is owned by the host app. Install its depe
 cd maizzle && npm install
 ```
 
+Use Node.js `18.20` or newer. Maizzle 5 will warn or fail on older runtimes.
+
 ## Run the Maizzle dev server
 
 Start the scaffolded Maizzle server:
 
 ```bash
-cd maizzle && npm run dev
+mix maizzlex.emails.dev
 ```
 
-Then open the host app preview at:
+Then open the Maizzle preview directly at:
 
 ```text
-/dev/maizzle
+http://127.0.0.1:3000
 ```
 
 ## Generate an email module and template
+
+Generate the first template only after the installer has created the host-side tree:
 
 ```bash
 mix igniter maizzlex.gen.email welcome_message
@@ -127,3 +133,24 @@ You can also override the imported Gettext module:
 ```bash
 mix igniter maizzlex.gen.email welcome_message --gettext-module MyApp.I18n
 ```
+
+## Recommended order
+
+```bash
+mix deps.get
+mix igniter.install maizzlex
+cd maizzle && npm install
+mix igniter maizzlex.gen.email welcome_message
+
+# terminal 1
+mix phx.server
+
+# terminal 2
+mix maizzlex.emails.dev
+
+# optional production build
+mix maizzlex.emails.build
+```
+
+The generated `prod.exs` and `runtime.exs` entries are placeholders. Replace the production
+adapter and credentials before deploying.

@@ -1,20 +1,15 @@
 /** @type {import('@maizzle/framework').Config} */
-module.exports = {
+export default {
   build: {
     output: {
       path: "../priv/emails",
     },
-    content: ["emails/**/*.html", "layouts/**/*.html", "components/**/*.html"],
-    static: {
-      source: ["images/**/*.*"],
-      destination: "images",
-    },
-    tailwind: {
-      css: "css/tailwind.css",
-    },
+    content: ["emails/**/*.html"],
+    static: [],
   },
   css: {
     inline: {
+      resolveCSSVariables: false,
       codeBlocks: {
         EJS: { start: ["<", "%"].join(""), end: ["%", ">"].join("") },
         HBS: { start: "{{", end: "}}" },
@@ -40,9 +35,6 @@ module.exports = {
     shorthand: true,
     prettify: false,
     minify: true,
-  },
-  purgeCSS: {
-    content: ["emails/**/*.*"],
   },
   prettify: false,
 }

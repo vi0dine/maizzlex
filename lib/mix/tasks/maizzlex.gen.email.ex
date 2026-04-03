@@ -25,7 +25,7 @@ defmodule Mix.Tasks.Maizzlex.Gen.Email do
       [name | _] ->
         app = Mix.Project.config()[:app] |> to_string()
         app_module = Macro.camelize(app)
-        gettext_module = Keyword.get(opts, :gettext_module, "#{app_module}Web.Gettext")
+        gettext_module = Keyword.get(opts, :gettext_module, "#{app_module}.Gettext")
         snake_name = Macro.underscore(name)
         template_scope = Macro.camelize(snake_name)
         module_base = "#{template_scope}Email"

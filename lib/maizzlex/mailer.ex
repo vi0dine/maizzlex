@@ -111,6 +111,31 @@ defmodule Maizzlex.Mailer do
       reraise(error, __STACKTRACE__)
   end
 
+  def put_gettext_helpers(assigns, gettext_backend) when is_atom(gettext_backend) do
+    assigns
+    |> Map.new()
+    |> Map.put_new(:gettext, fn msgid -> gettext_call(:gettext, [gettext_backend, msgid]) end)
+    |> Map.put_new(:dgettext, fn domain, msgid ->
+      gettext_call(:dgettext, [gettext_backend, domain, msgid])
+    end)
+    |> Map.put_new(:ngettext, fn msgid, msgid_plural, count ->
+      gettext_call(:ngettext, [gettext_backend, msgid, msgid_plural, count])
+    end)
+    |> Map.put_new(:dngettext, fn domain, msgid, msgid_plural, count ->
+      gettext_call(:dngettext, [gettext_backend, domain, msgid, msgid_plural, count])
+    end)
+  end
+
+  def with_locale(assigns, gettext_backend, fun)
+      when is_atom(gettext_backend) and is_function(fun, 1) do
+    assigns = Map.new(assigns)
+
+    case locale_from_assigns(assigns) do
+      nil -> fun.(assigns)
+      locale -> gettext_call(:with_locale, [gettext_backend, locale, fn -> fun.(assigns) end])
+    end
+  end
+
   def send_email(mailer_module, otp_app, email, attachments) do
     config = mailer_config(otp_app, mailer_module)
 
@@ -220,6 +245,43 @@ defmodule Maizzlex.Mailer do
         |> Swoosh.Email.header("List-Unsubscribe", Enum.join(values, ", "))
         |> maybe_add_list_unsubscribe_post(unsubscribe_url)
     end
+  end
+
+  defp locale_from_assigns(assigns) do
+    assigns
+    |> direct_locale()
+    |> case do
+      nil ->
+        assigns
+        |> nested_user_locale()
+        |> normalize_locale()
+
+      locale ->
+        normalize_locale(locale)
+    end
+  end
+
+  defp direct_locale(assigns) do
+    Map.get(assigns, :locale) ||
+      Map.get(assigns, "locale") ||
+      Map.get(assigns, :language) ||
+      Map.get(assigns, "language")
+  end
+
+  defp nested_user_locale(assigns) do
+    case Map.get(assigns, :user) || Map.get(assigns, "user") do
+      %{language: language} -> language
+      %{"language" => language} -> language
+      _ -> nil
+    end
+  end
+
+  defp normalize_locale(locale) when is_atom(locale), do: Atom.to_string(locale)
+  defp normalize_locale(locale) when is_binary(locale) and locale != "", do: locale
+  defp normalize_locale(_locale), do: nil
+
+  defp gettext_call(function_name, args) do
+    :erlang.apply(:"Elixir.Gettext", function_name, args)
   end
 
   defp maybe_add_list_unsubscribe_post(email, nil), do: email

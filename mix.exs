@@ -26,12 +26,8 @@ defmodule Maizzlex.MixProject do
   defp deps do
     [
       {:html2text, "~> 0.2"},
-      {:gun, "~> 2.1"},
       {:igniter, "~> 0.6", optional: true},
-      {:plug, "~> 1.14"},
-      {:reverse_proxy_plug_websocket, "~> 0.2"},
-      {:swoosh, "~> 1.14"},
-      {:websockex, "~> 0.4"}
+      {:swoosh, "~> 1.14"}
     ]
   end
 

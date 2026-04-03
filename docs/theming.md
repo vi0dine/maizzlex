@@ -1,6 +1,6 @@
-# Theming and Palette Generation
+# Theming and Palette
 
-`Maizzlex` ships a small host-side palette generator for Maizzle.
+`Maizzlex` ships a small host-side palette helper for Maizzle.
 
 Instead of forcing you to hand-maintain full Tailwind color scales, the host app declares semantic base colors and `Maizzlex` expands them into `50..950` shades.
 
@@ -9,11 +9,11 @@ Instead of forcing you to hand-maintain full Tailwind color scales, the host app
 The host app owns:
 
 - `maizzle/config.js`
+- `maizzle/tailwind.config.js`
+- `maizzle/css/tailwind.css`
 - `maizzle/utils/palette.js`
-- `maizzle/utils/write-theme.js`
-- `maizzle/css/generated-theme.css`
 
-The generated `generated-theme.css` file is rebuilt before each Maizzle build.
+The palette is resolved directly inside `tailwind.config.js`, so there is no generated CSS file to keep in sync.
 
 ## Base color configuration
 
@@ -81,7 +81,7 @@ The `500` shade is always the exact base color. Lighter shades are mixed toward 
 
 ## Using theme colors in templates
 
-Once generated, the colors are available as standard theme tokens in Maizzle/Tailwind:
+Once resolved by `tailwind.config.js`, the colors are available as standard theme tokens in Maizzle/Tailwind:
 
 ```html
 <div class="bg-primary-50 text-content-900 border border-primary-200">
@@ -97,32 +97,39 @@ Typical usage patterns:
 - `bg-success-*`, `bg-warning-*`, `bg-error-*` for status messaging
 - `accent-*` for secondary emphasis
 
-## How theme generation works
+## How theme resolution works
 
-The scaffolded `package.json` calls `write-theme.js` before each build:
+The scaffolded `tailwind.config.js` imports the host config and expands the palette directly:
 
-```json
-{
-  "scripts": {
-    "dev": "node ./utils/write-theme.js && maizzle serve",
-    "build:dev": "node ./utils/write-theme.js && maizzle build development",
-    "build": "node ./utils/write-theme.js && maizzle build production"
-  }
+```js
+import emailPreset from "tailwindcss-preset-email"
+
+import maizzleConfig from "./config.js"
+import { buildPalette } from "./utils/palette.js"
+
+const baseColors = maizzleConfig.maizzlex?.baseColors || {}
+
+export default {
+  content: [
+    "./components/**/*.html",
+    "./emails/**/*.html",
+    "./layouts/**/*.html",
+  ],
+  presets: [emailPreset],
+  theme: {
+    extend: {
+      colors: buildPalette(baseColors),
+    },
+  },
 }
 ```
 
-`write-theme.js`:
-
-1. loads `maizzle/config.js`
-2. reads `maizzlex.baseColors`
-3. expands the palette
-4. writes `maizzle/css/generated-theme.css`
-
-`tailwind.css` then imports the generated file:
+`tailwind.css` points Maizzle at that Tailwind config:
 
 ```css
-@import "@maizzle/tailwindcss";
-@import "./generated-theme.css";
+@config "tailwind.config.js";
+@tailwind components;
+@tailwind utilities;
 ```
 
 ## Gettext in layouts

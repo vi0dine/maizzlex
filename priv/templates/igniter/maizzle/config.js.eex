@@ -1,13 +1,10 @@
 /** @type {import('@maizzle/framework').Config} */
-module.exports = {
+export default {
   build: {
     content: ["emails/**/*.html", "layouts/**/*.html", "components/**/*.html"],
     static: {
       source: ["images/**/*.*"],
       destination: "images",
-    },
-    tailwind: {
-      css: "css/tailwind.css",
     },
   },
   css: {

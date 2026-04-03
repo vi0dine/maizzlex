@@ -1,0 +1,24 @@
+import emailPreset from "tailwindcss-preset-email"
+
+import maizzleConfig from "./config.js"
+import { buildPalette } from "./utils/palette.js"
+
+const baseColors = maizzleConfig.maizzlex?.baseColors || {}
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./components/**/*.html",
+    "./emails/**/*.html",
+    "./layouts/**/*.html",
+  ],
+  presets: [emailPreset],
+  theme: {
+    extend: {
+      colors: buildPalette(baseColors),
+      fontFamily: {
+        sans: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+      },
+    },
+  },
+}
